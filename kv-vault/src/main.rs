@@ -44,6 +44,7 @@ impl ProviderHandler for KvVaultProvider {
     #[instrument(level = "debug", skip(self, ld), fields(actor_id = %ld.actor_id))]
     async fn put_link(&self, ld: &LinkDefinition) -> RpcResult<bool> {
         let config = Config::from_values(&ld.values)?;
+        let (tx, rx) = tokio::sync::oneshot::channel();
         let client = Client::new(config).map_err(to_rpc_err)?;
         let mut update_map = self.actors.write().await;
         info!("adding link for actor");
